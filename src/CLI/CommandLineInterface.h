@@ -11,11 +11,15 @@
 class CommandLineInterface : public GameInterface {
 public:
     CommandLineInterface();
+    CommandLineInterface(Player *player);
 
     void setup_new_game() override;
     void update_screen() override;
 
-    virtual Coordinates* input_coordinates() override;
+    Coordinates* input_coordinates() override;
+
+    void win_display() override;
+    void lose_display() override;
 };
 
 

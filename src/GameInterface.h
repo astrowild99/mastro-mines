@@ -25,8 +25,11 @@ public:
     int game_loop();
 
     virtual void setup_new_game() = 0;
-    virtual Coordinates* input_coordinates();
+    virtual Coordinates* input_coordinates() = 0;
     virtual void update_screen() = 0;
+
+    virtual void win_display() = 0;
+    virtual void lose_display() = 0;
 };
 
 

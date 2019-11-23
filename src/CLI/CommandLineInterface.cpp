@@ -8,6 +8,10 @@ CommandLineInterface::CommandLineInterface() : GameInterface() {
     printf(" . . . Starting a new Game . . . \n");
 }
 
+CommandLineInterface::CommandLineInterface(Player *player) : GameInterface(){
+    this->player = player;
+}
+
 void CommandLineInterface::setup_new_game(){
     int x, y, m;
     printf("\nInput field size: x,y,mines: ");
@@ -17,11 +21,19 @@ void CommandLineInterface::setup_new_game(){
 
 Coordinates* CommandLineInterface::input_coordinates() {
     int x, y;
-    printf("\nHit a target: x,y");
+    printf("\nHit a target: x,y:\n");
     scanf("%d,%d", &x, &y);
     return new Coordinates(x, y);
 }
 
 void CommandLineInterface::update_screen() {
     this->field->print();
+}
+
+void CommandLineInterface::win_display() {
+    printf("\n . . . WIN . . .\n");
+}
+
+void CommandLineInterface::lose_display() {
+    printf("\n . . . LOSE . . .\n");
 }
