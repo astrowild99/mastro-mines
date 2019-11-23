@@ -12,20 +12,29 @@ class Box {
 private:
     int type, value;
     bool triggered;
+    Coordinates *coordinates;
 public:
     Box();
+    Box(Coordinates *coordinates);
     Box(int type);
-    Box(int type, int value);
+    Box(int type, Coordinates *coordinates);
+    Box(int type, int x, int y);
+
+    std::string to_string();
 
     int get_type();
     Box set_type(int type);
     int get_value();
     Box set_value(int value);
+    Coordinates *get_coordinates();
+    Box set_coordinates(Coordinates *coordinates);
+    Box set_coordinates(int x, int y);
     bool get_triggered();
     char get_display();
 
     void set_mines_count(int count);
     void trigger();
+
     static const int EMPTY_TYPE = 0;
     static const int MINE_TYPE = 1;
     static const int NUMBER_TYPE = 2;

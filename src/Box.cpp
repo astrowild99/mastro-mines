@@ -7,15 +7,26 @@
 
 Box::Box() {
     this->type = Box::EMPTY_TYPE;
+    this->coordinates = new Coordinates();
 }
 
 Box::Box(int type) {
     this->type = type;
+    this->coordinates = new Coordinates();
 }
 
-Box::Box(int type, int value) {
+Box::Box(int type, Coordinates *coordinates) {
     this->type = type;
-    this->value = value;
+    this->coordinates = coordinates;
+}
+
+Box::Box(int type, int x, int y) {
+    this->type = type;
+    this->coordinates = new Coordinates(x, y);
+}
+
+Box::Box(Coordinates *coordinates) {
+    this->coordinates = coordinates;
 }
 
 int Box::get_value() {
@@ -52,6 +63,22 @@ char Box::get_display() {
     return std::to_string(this->value)[0];
 }
 
+Coordinates* Box::get_coordinates() {
+    return this->coordinates;
+}
+
+Box Box::set_coordinates(Coordinates *coordinates) {
+    this->coordinates = coordinates;
+
+    return *this;
+}
+
+Box Box::set_coordinates(int x, int y) {
+    this->coordinates = new Coordinates(x, y);
+
+    return *this;
+}
+
 void Box::set_mines_count(int count) {
     if(count > 0){
         this->set_value(count);
@@ -62,4 +89,8 @@ void Box::set_mines_count(int count) {
 void Box::trigger() {
     if(!this->triggered)
         this->triggered = true;
+}
+
+std::string Box::to_string() {
+    return "" + coordinates->to_string() + " Value: " + std::to_string(this->value) + " type: " + std::to_string(this->type);
 }

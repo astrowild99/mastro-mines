@@ -7,6 +7,7 @@
 
 
 #include "Box.h"
+#include "Coordinates.h"
 
 class Field {
 private:
@@ -23,7 +24,18 @@ public:
     int get_len_x();
     int get_len_y();
 
-    void trigger(int x, int y);
+    Box *get_box_at(Coordinates *coordinates);
+    Box *get_box_at(int x, int y);
+    Box *get_surr(Coordinates *coordinates);
+    Box *get_surr(int x, int y);
+    int get_surr_triggered(Coordinates *coordinates);
+    int get_surr_triggered(int x, int y);
+
+    Box *trigger(Coordinates *coordinates);
+    Box *trigger(int x, int y);
+    Box *trigger(Box *box);
+    void trigger_cascade(Coordinates *coordinates);
+    void trigger_cascade(int x, int y);
 
     void print();
     void print_types();

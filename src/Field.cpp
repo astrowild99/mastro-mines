@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "Field.h"
+#include "Coordinates.h"
 
 Field::Field(int len_x, int len_y) {
     this->len_x = len_x;
@@ -14,6 +15,13 @@ Field::Field(int len_x, int len_y) {
     this->field_matrix = new Box*[len_y];
     for(int i = 0; i < len_x; i++)
         this->field_matrix[i] = new Box[len_x];
+
+    //and getting the coordinates ready
+    for(int j = 0; j < len_y; j++){
+        for(int i = 0; i < len_x; i++){
+            this->field_matrix[i][j].set_coordinates(new Coordinates(i, j));
+        }
+    }
 }
 
 Field::Field(int len_x, int len_y, int mines) : Field::Field(len_x, len_y){
@@ -71,8 +79,24 @@ void Field::print_values() {
     }
 }
 
-void Field::trigger(int x, int y) {
+Box* Field::trigger(Coordinates *coordinates) {
+    this->field_matrix[coordinates->get_x()][coordinates->get_y()].trigger();
+
+    return &this->field_matrix[coordinates->get_x()][coordinates->get_y()];
+}
+
+Box* Field::trigger(int x, int y) {
     this->field_matrix[x][y].trigger();
+
+    return &this->field_matrix[x][y];
+}
+
+Box* Field::trigger(Box *box) {
+    int x = box->get_coordinates()->get_x();
+    int y = box->get_coordinates()->get_y();
+    this->field_matrix[x][y].trigger();
+
+    return &this->field_matrix[x][y];
 }
 
 int Field::count_mines(int x, int y) {
@@ -86,7 +110,6 @@ int Field::count_mines(int x, int y) {
         for(int i = box_start_x; i <= box_end_x; i++){
             if(this->field_matrix[i][j].get_type() == Box::MINE_TYPE) {
                 count++;
-                printf("\t\tDEBUG: !!!!!!!!!!!mine found!!!!!!!!!!!\n");
             }
         }
     }
@@ -117,4 +140,79 @@ void Field::update_count() {
             }
         }
     }
+}
+
+Box* Field::get_box_at(int x, int y){
+    return &this->field_matrix[x][y];
+}
+
+Box* Field::get_box_at(Coordinates *coordinates) {
+    return this->get_box_at(coordinates->get_x(), coordinates->get_y());
+}
+
+Box* Field::get_surr(Coordinates *coordinates) {
+    Box* surr = new Box[8];
+    int x = coordinates->get_x(), y = coordinates->get_y();
+    int box_start_x, box_start_y, box_end_x, box_end_y, count = 0;
+    box_start_x = this->sanitize_x(x - 1);
+    box_start_y = this->sanitize_y(y - 1);
+    box_end_x = this->sanitize_x(x + 1);
+    box_end_y = this->sanitize_y(y + 1);
+
+    for(int j = box_start_y; j <= box_end_y; j++){
+        for(int i = box_start_x; i <= box_end_x; i++){
+            if((i != x) || (j != y)) {
+                surr[count] = this->field_matrix[i][j];
+                count++;
+            }
+        }
+    }
+
+    return surr;
+}
+
+Box* Field::get_surr(int x, int y) {
+    Coordinates *coordinates = new Coordinates(x, y);
+    return this->get_surr(coordinates);
+}
+
+int Field::get_surr_triggered(Coordinates *coordinates) {
+    Box *array = this->get_surr(coordinates);
+    int count = 0;
+    for(int i = 0; i < 8; i++){
+        if(array[i].get_type() == Box::EMPTY_TYPE && array[i].get_triggered()) {
+            count += 1;
+        }
+    }
+    return count;
+}
+
+int Field::get_surr_triggered(int x, int y) {
+    Coordinates *coordinates = new Coordinates(x, y);
+    return this->get_surr_triggered(coordinates);
+}
+
+void Field::trigger_cascade(Coordinates *coordinates) {
+    this->trigger(coordinates);
+
+    bool go_on = true;
+    while(go_on){
+        go_on = false;
+        for(int j = 0; j < this->get_len_y(); j++){
+            for(int i = 0; i < this->get_len_x(); i++){
+                if(this->get_surr_triggered(i, j) > 0){
+                    if(this->field_matrix[i][j].get_type() != Box::MINE_TYPE && !this->field_matrix[i][j].get_triggered()){
+                        go_on = true;
+                        this->field_matrix[i][j].trigger();
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Field::trigger_cascade(int x, int y) {
+    Coordinates *coordinates = new Coordinates(x, y);
+
+    return this->trigger_cascade(coordinates);
 }
