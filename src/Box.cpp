@@ -39,7 +39,7 @@ Box Box::set_value(int value) {
     return *this;
 }
 
-bool Box::get_triggered() {
+bool Box::is_triggered() {
     return this->triggered;
 }
 

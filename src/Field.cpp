@@ -44,6 +44,16 @@ Field::Field(int len_x, int len_y, int mines) : Field::Field(len_x, len_y){
     this->update_count();
 }
 
+Field::Field(Coordinates *coordinates) : Field(coordinates->get_x(), coordinates->get_y()){}
+
+Field::Field(Coordinates *coordinates, int mines) : Field(coordinates->get_x(), coordinates->get_y(), mines){}
+
+Field::Field() : Field(Field::STD_X, Field::STD_Y, Field::STD_MINES){}
+
+Field::~Field() {
+    free(this->field_matrix);
+}
+
 int Field::get_len_x() {
     return this->len_x;
 }
@@ -180,7 +190,7 @@ int Field::get_surr_triggered(Coordinates *coordinates) {
     Box *array = this->get_surr(coordinates);
     int count = 0;
     for(int i = 0; i < 8; i++){
-        if(array[i].get_type() == Box::EMPTY_TYPE && array[i].get_triggered()) {
+        if(array[i].get_type() == Box::EMPTY_TYPE && array[i].is_triggered()) {
             count += 1;
         }
     }
@@ -195,13 +205,16 @@ int Field::get_surr_triggered(int x, int y) {
 void Field::trigger_cascade(Coordinates *coordinates) {
     this->trigger(coordinates);
 
+    if(!this->get_box_at(coordinates)->get_type() == Box::EMPTY_TYPE)
+        return;
+
     bool go_on = true;
     while(go_on){
         go_on = false;
         for(int j = 0; j < this->get_len_y(); j++){
             for(int i = 0; i < this->get_len_x(); i++){
                 if(this->get_surr_triggered(i, j) > 0){
-                    if(this->field_matrix[i][j].get_type() != Box::MINE_TYPE && !this->field_matrix[i][j].get_triggered()){
+                    if(this->field_matrix[i][j].get_type() != Box::MINE_TYPE && !this->field_matrix[i][j].is_triggered()){
                         go_on = true;
                         this->field_matrix[i][j].trigger();
                     }
@@ -215,4 +228,27 @@ void Field::trigger_cascade(int x, int y) {
     Coordinates *coordinates = new Coordinates(x, y);
 
     return this->trigger_cascade(coordinates);
+}
+
+int Field::get_status() {
+    return this->status;
+}
+
+void Field::update_status() {
+    bool is_empty = true;
+    for(int j = 0; j < this->len_y; j++){
+        for(int i = 0; i < this->len_x; i++){
+            if(this->field_matrix[i][j].is_triggered()){
+                if(this->field_matrix[i][j].get_type() == Box::MINE_TYPE) {
+                    this->status = STATUS_LOSE;
+                    return;
+                }
+            }
+            else{
+                is_empty = false;
+            }
+        }
+    }
+    if(is_empty)
+        this->status = Field::STATUS_WIN;
 }

@@ -11,15 +11,29 @@
 
 class Field {
 private:
-    int len_x, len_y, mines = 0;
+    int len_x, len_y, mines = 0, status = Field::STATUS_PLAYING;
     Box **field_matrix;
     int count_mines(int x, int y);
     void update_count();
     int sanitize_x(int x);
     int sanitize_y(int y);
+
+protected:
+    static const int STD_X = 8;
+    static const int STD_Y = 8;
+    static const int STD_MINES = 10;
 public:
+    static const int STATUS_PLAYING = 0;
+    static const int STATUS_LOSE = 1;
+    static const int STATUS_WIN = 2;
+
+    Field();
+    Field(Coordinates *coordinates);
+    Field(Coordinates *coordinates, int mines);
     Field(int len_x, int len_y);
     Field(int len_x, int len_y, int mines);
+
+    ~Field();
 
     int get_len_x();
     int get_len_y();
@@ -30,6 +44,7 @@ public:
     Box *get_surr(int x, int y);
     int get_surr_triggered(Coordinates *coordinates);
     int get_surr_triggered(int x, int y);
+    int get_status();
 
     Box *trigger(Coordinates *coordinates);
     Box *trigger(int x, int y);
@@ -40,6 +55,8 @@ public:
     void print();
     void print_types();
     void print_values();
+
+    void update_status();
 };
 
 

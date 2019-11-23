@@ -29,7 +29,7 @@ public:
     Coordinates *get_coordinates();
     Box set_coordinates(Coordinates *coordinates);
     Box set_coordinates(int x, int y);
-    bool get_triggered();
+    bool is_triggered();
     char get_display();
 
     void set_mines_count(int count);
