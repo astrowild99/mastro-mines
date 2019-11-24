@@ -12,9 +12,9 @@ Field::Field(int len_x, int len_y) {
     this->len_y = len_y;
 
     //creating the matrix
-    this->field_matrix = new Box*[len_y];
+    this->field_matrix = new Box*[len_x];
     for(int i = 0; i < len_x; i++)
-        this->field_matrix[i] = new Box[len_x];
+        this->field_matrix[i] = new Box[len_y];
 
     //and getting the coordinates ready
     for(int j = 0; j < len_y; j++){
@@ -51,13 +51,6 @@ Field::Field(Coordinates *coordinates) : Field(coordinates->get_x(), coordinates
 Field::Field(Coordinates *coordinates, int mines) : Field(coordinates->get_x(), coordinates->get_y(), mines){}
 
 Field::Field() : Field(Field::STD_X, Field::STD_Y, Field::STD_MINES){}
-
-Field::~Field() {
-    for (int i = 0; i < this->len_x; i++) {
-        delete[] this->field_matrix[i];
-    }
-    delete[] this->field_matrix;
-}
 
 int Field::get_len_x() {
     return this->len_x;

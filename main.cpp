@@ -22,7 +22,6 @@ int main(int argc, char** argv) {
         }
     }
     gtk_init(&argc, &argv);
-    GraphicUserInterface *gui = new GraphicUserInterface(argc, argv);
-    gui->setup_new_game();
+    GraphicUserInterface::init_window(argc, argv);
     return 0;
 }

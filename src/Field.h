@@ -20,9 +20,9 @@ private:
     int sanitize_y(int y);
 
 public:
-    static const int STD_X = 8;
-    static const int STD_Y = 8;
-    static const int STD_MINES = 10;
+    static const int STD_X = 16;
+    static const int STD_Y = 16;
+    static const int STD_MINES = 40;
 
     static const int STATUS_PLAYING = 0;
     static const int STATUS_LOSE = 1;
@@ -33,8 +33,6 @@ public:
     Field(Coordinates *coordinates, int mines);
     Field(int len_x, int len_y);
     Field(int len_x, int len_y, int mines);
-
-    ~Field();
 
     int get_len_x();
     int get_len_y();

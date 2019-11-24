@@ -14,16 +14,16 @@ static GtkEntryBuffer *buffer_x = NULL, *buffer_y = NULL, *buffer_mines = NULL;
 
 static GtkWidget *window, *grid, *missing_counter;
 
-GraphicUserInterface::GraphicUserInterface(int argc, char** argv) : GraphicUserInterface(argc, argv, new Player()) {}
+static GtkApplication *app;
 
-GraphicUserInterface::GraphicUserInterface(int argc, char** argv, Player *player) : GameInterface(){
-    this->argc = argc;
-    this->argv = argv;
+GraphicUserInterface::GraphicUserInterface() : GraphicUserInterface(new Player()) {}
+
+GraphicUserInterface::GraphicUserInterface(Player *player) : GameInterface(){
     this->player = player;
 }
 
 void GraphicUserInterface::setup_new_game() {
-    GraphicUserInterface::init_window(this->argc, this->argv);
+
 }
 
 Coordinates* GraphicUserInterface::input_coordinates() {
@@ -79,7 +79,7 @@ void GraphicUserInterface::win_display() {
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
     gtk_widget_destroy(window);
-    delete field;
+    delete this;
 }
 
 void GraphicUserInterface::lose_display() {
@@ -96,14 +96,14 @@ void GraphicUserInterface::lose_display() {
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
     gtk_widget_destroy(window);
-    delete field;
+    delete this;
 }
 
 int GraphicUserInterface::init_window(int argc, char **argv) {
     int status;
 
     app = gtk_application_new("mines.donato.com", G_APPLICATION_FLAGS_NONE);
-    g_signal_connect(app, "activate", G_CALLBACK(GraphicUserInterface::activate), this);
+    g_signal_connect(app, "activate", G_CALLBACK(GraphicUserInterface::activate), NULL);
     status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);
     return status;
@@ -116,7 +116,6 @@ void GraphicUserInterface::activate(GtkApplication *app, gpointer data) {
     GtkWidget *box;
     GtkWidget *label_x, *label_y, *label_mines;
     GtkWidget *entry_x, *entry_y, *entry_mines;
-    GraphicUserInterface *gui = (GraphicUserInterface*) data;
 
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Mines");
@@ -145,21 +144,21 @@ void GraphicUserInterface::activate(GtkApplication *app, gpointer data) {
     gtk_container_add(GTK_CONTAINER(box), entry_mines);
 
     //setting defaults
-    gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_x), std::to_string(Field::STD_X).c_str(), 1);
-    gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_y), std::to_string(Field::STD_Y).c_str(), 1);
+    gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_x), std::to_string(Field::STD_X).c_str(), 2);
+    gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_y), std::to_string(Field::STD_Y).c_str(), 2);
     gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_mines), std::to_string(Field::STD_MINES).c_str(), 2);
 
     button_box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_container_add(GTK_CONTAINER(box), button_box);
 
     start_button = gtk_button_new_with_label("Start");
-    g_signal_connect(start_button, "clicked", G_CALLBACK(GraphicUserInterface::start_game), gui);
+    g_signal_connect(start_button, "clicked", G_CALLBACK(GraphicUserInterface::start_game), NULL);
     gtk_container_add(GTK_CONTAINER(button_box), start_button);
     gtk_widget_show_all(window);
 }
 
 void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
-    GraphicUserInterface *gui = (GraphicUserInterface*) data;
+    GraphicUserInterface *gui = new GraphicUserInterface();
     GtkWidget *box;
     GtkWidget *button;
 
