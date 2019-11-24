@@ -10,8 +10,8 @@
 
 class CommandLineInterface : public GameInterface {
 public:
-    CommandLineInterface();
-    CommandLineInterface(Player *player);
+    CommandLineInterface(int argc, char** argv);
+    CommandLineInterface(int argc, char** argv, Player *player);
 
     void setup_new_game() override;
     void update_screen() override;

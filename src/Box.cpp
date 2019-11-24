@@ -7,26 +7,31 @@
 
 Box::Box() {
     this->type = Box::EMPTY_TYPE;
+    this->triggered = false;
     this->coordinates = new Coordinates();
 }
 
 Box::Box(int type) {
     this->type = type;
+    this->triggered = false;
     this->coordinates = new Coordinates();
 }
 
 Box::Box(int type, Coordinates *coordinates) {
     this->type = type;
+    this->triggered = false;
     this->coordinates = coordinates;
 }
 
 Box::Box(int type, int x, int y) {
     this->type = type;
+    this->triggered = false;
     this->coordinates = new Coordinates(x, y);
 }
 
 Box::Box(Coordinates *coordinates) {
     this->coordinates = coordinates;
+    this->triggered = false;
 }
 
 int Box::get_value() {
@@ -51,6 +56,14 @@ Box Box::set_type(int type) {
     this->type = type;
 
     return *this;
+}
+
+int Box::get_x() {
+    return this->coordinates->get_x();
+}
+
+int Box::get_y() {
+    return this->coordinates->get_y();
 }
 
 char Box::get_display() {

@@ -214,8 +214,12 @@ void Field::trigger_cascade(Coordinates *coordinates) {
         go_on = false;
         for(int j = 0; j < this->get_len_y(); j++){
             for(int i = 0; i < this->get_len_x(); i++){
-                if(this->get_surr_triggered(i, j) > 0){
-                    if(this->field_matrix[i][j].get_type() != Box::MINE_TYPE && !this->field_matrix[i][j].is_triggered()){
+                int surr = this->get_surr_triggered(i, j);
+                if(surr > 0){
+                    if(
+                            this->field_matrix[i][j].get_type() != Box::MINE_TYPE &&
+                            !this->field_matrix[i][j].is_triggered()
+                            ){
                         go_on = true;
                         this->field_matrix[i][j].trigger();
                     }

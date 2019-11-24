@@ -14,9 +14,12 @@ private:
     GtkApplication *app;
     int gtk_window_id;
 
+    int argc;
+    char** argv;
+
 public:
-    GraphicUserInterface(Player *player);
-    GraphicUserInterface();
+    GraphicUserInterface(int argc, char** argv,Player *player);
+    GraphicUserInterface(int argc, char** argv);
 
     void setup_new_game();
     Coordinates* input_coordinates();
@@ -32,6 +35,7 @@ public:
 
     static void activate(GtkApplication *app, gpointer data);
     static void start_game(GtkApplication *app, gpointer data);
+    static void hit_target(GtkApplication *app, gpointer data);
 
 };
 

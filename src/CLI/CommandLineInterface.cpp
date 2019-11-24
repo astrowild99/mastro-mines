@@ -4,11 +4,11 @@
 
 #include "CommandLineInterface.h"
 
-CommandLineInterface::CommandLineInterface() : GameInterface() {
+CommandLineInterface::CommandLineInterface(int argc, char** argv) : GameInterface() {
     printf(" . . . Starting a new Game . . . \n");
 }
 
-CommandLineInterface::CommandLineInterface(Player *player) : GameInterface(){
+CommandLineInterface::CommandLineInterface(int argc, char** argv, Player *player) : GameInterface(){
     this->player = player;
 }
 

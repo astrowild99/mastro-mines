@@ -5,16 +5,25 @@
 #include "GraphicUserInterface.h"
 #include <gtk/gtk.h>
 
+struct hit_target_struct {
+    GraphicUserInterface *gui;
+    Box *box;
+};
+
 static GtkEntryBuffer *buffer_x = NULL, *buffer_y = NULL, *buffer_mines = NULL;
 
-GraphicUserInterface::GraphicUserInterface() : GraphicUserInterface(new Player()) {}
+static GtkWidget *grid;
 
-GraphicUserInterface::GraphicUserInterface(Player *player){
+GraphicUserInterface::GraphicUserInterface(int argc, char** argv) : GraphicUserInterface(argc, argv, new Player()) {}
+
+GraphicUserInterface::GraphicUserInterface(int argc, char** argv, Player *player) : GameInterface(){
+    this->argc = argc;
+    this->argv = argv;
     this->player = player;
 }
 
 void GraphicUserInterface::setup_new_game() {
-
+    GraphicUserInterface::init_window(this->argc, this->argv);
 }
 
 Coordinates* GraphicUserInterface::input_coordinates() {
@@ -22,7 +31,18 @@ Coordinates* GraphicUserInterface::input_coordinates() {
 }
 
 void GraphicUserInterface::update_screen() {
-
+    GtkWidget *button;
+    Box *box;
+    for(int j = 0; j < this->field->get_len_y(); j++){
+        for(int i = 0; i < this->field->get_len_x(); i++){
+            box = field->get_box_at(i, j);
+            if(box->is_triggered()){
+                button = gtk_grid_get_child_at(GTK_GRID(grid), i, j);
+                gtk_button_set_label(GTK_BUTTON(button), box->get_string_display().c_str());
+                gtk_widget_set_sensitive(button, FALSE);
+            }
+        }
+    }
 }
 
 void GraphicUserInterface::win_display() {
@@ -93,7 +113,6 @@ void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
     GraphicUserInterface *gui = (GraphicUserInterface*) data;
     GtkWidget *window;
     GtkWidget *box;
-    GtkWidget *grid;
     GtkWidget *button;
 
     //setting up the game
@@ -112,6 +131,8 @@ void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
 
     grid = gtk_grid_new();
     gtk_container_add(GTK_CONTAINER(box), grid);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 2);
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 2);
 
     //printing the grid
     for(int j = 0; j < gui->field->get_len_y(); j++){
@@ -119,11 +140,26 @@ void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
             button = gtk_button_new();
             gtk_button_set_label(GTK_BUTTON(button), gui->field->get_box_at(i, j)->get_string_display().c_str());
 
+            auto *s = new hit_target_struct;
+            s->gui = gui;
+            s->box = gui->field->get_box_at(i, j);
+            g_signal_connect(button, "clicked", G_CALLBACK(GraphicUserInterface::hit_target), s);
             gtk_grid_attach(GTK_GRID(grid), button, i, j, 1, 1);
         }
     }
 
     gtk_widget_show_all(window);
+}
+
+void GraphicUserInterface::hit_target(GtkApplication *app, gpointer data) {
+    GtkWidget *button;
+    auto *s = (hit_target_struct*) data;
+    auto *gui = (GraphicUserInterface*) s->gui;
+    Box *box = (Box*) s->box;
+
+    //triggering the cascade
+    gui->field->trigger_cascade(s->box->get_x(), s->box->get_y());
+    gui->update_screen();
 
 }
 

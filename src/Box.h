@@ -27,6 +27,8 @@ public:
     int get_value();
     Box set_value(int value);
     Coordinates *get_coordinates();
+    int get_x();
+    int get_y();
     Box set_coordinates(Coordinates *coordinates);
     Box set_coordinates(int x, int y);
     Box set_triggered(bool triggered);
