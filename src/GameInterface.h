@@ -12,7 +12,6 @@
 class GameInterface {
 protected:
     Player *player;
-    Coordinates *field_size;
     Field *field;
     time_t time_elapsed = 0;
 

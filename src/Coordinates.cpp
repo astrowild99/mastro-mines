@@ -15,10 +15,6 @@ Coordinates::Coordinates(int x, int y) {
     this->y = y;
 }
 
-Coordinates::~Coordinates() {
-
-}
-
 int Coordinates::get_x() {
     return this->x;
 }

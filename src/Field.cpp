@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <gtk/gtk.h>
 #include "Field.h"
 #include "Coordinates.h"
 
@@ -12,17 +13,27 @@ Field::Field(int len_x, int len_y) {
     this->len_y = len_y;
 
     //creating the matrix
-    this->field_matrix = new Box*[len_x];
-    for(int i = 0; i < len_x; i++)
-        this->field_matrix[i] = new Box[len_y];
+    field_matrix.resize(len_x);
+    for(int j = 0; j < len_x; j++){
+        field_matrix[j].resize(len_y);
+    }
+
+    for(int j = 0; j < len_y; j++){
+        for(int i = 0; i < len_x; i++){
+            field_matrix[i][j] = new Box(Box::EMPTY_TYPE, i, j);
+            g_print("%s\n", field_matrix[i][j]->to_string().c_str());
+        }
+    }
 
     //and getting the coordinates ready
     for(int j = 0; j < len_y; j++){
         for(int i = 0; i < len_x; i++){
-            this->field_matrix[i][j].set_coordinates(new Coordinates(i, j));
-            this->field_matrix[i][j].set_triggered(false);
+            this->field_matrix[i][j]->set_coordinates(new Coordinates(i, j));
+            this->field_matrix[i][j]->set_triggered(false);
         }
     }
+
+    g_print("FIELD CREATED\n");
 }
 
 Field::Field(int len_x, int len_y, int mines) : Field::Field(len_x, len_y){
@@ -36,21 +47,22 @@ Field::Field(int len_x, int len_y, int mines) : Field::Field(len_x, len_y){
     for(int i = 0; i < mines; i++){
         x = rand() % this->len_x;
         y = rand() % this->len_y;
-        if(this->field_matrix[x][y].get_type() != Box::EMPTY_TYPE){
+        if(this->field_matrix[x][y]->get_type() != Box::EMPTY_TYPE){
             i--;
             continue;
         }
-        field_matrix[x][y].set_type(Box::MINE_TYPE);
+        field_matrix[x][y]->set_type(Box::MINE_TYPE);
     }
 
     this->update_count();
 }
 
-Field::Field(Coordinates *coordinates) : Field(coordinates->get_x(), coordinates->get_y()){}
-
-Field::Field(Coordinates *coordinates, int mines) : Field(coordinates->get_x(), coordinates->get_y(), mines){}
-
 Field::Field() : Field(Field::STD_X, Field::STD_Y, Field::STD_MINES){}
+
+Field::~Field() {
+    this->field_matrix.clear();
+    g_print("FIELD DELETED\n");
+}
 
 int Field::get_len_x() {
     return this->len_x;
@@ -63,7 +75,7 @@ int Field::get_len_y() {
 void Field::print() {
     for(int j = 0; j < this->len_y; j++){
         for(int i = 0; i < this->len_x; i++){
-            printf(" %c", this->field_matrix[i][j].get_display());
+            printf(" %c", this->field_matrix[i][j]->get_display());
         }
         printf("\n");
     }
@@ -72,7 +84,7 @@ void Field::print() {
 void Field::print_types() {
     for(int j = 0; j < this->len_y; j++){
         for(int i = 0; i < this->len_x; i++){
-            printf(" %d", this->field_matrix[i][j].get_type());
+            printf(" %d", this->field_matrix[i][j]->get_type());
         }
         printf("\n");
     }
@@ -81,39 +93,39 @@ void Field::print_types() {
 void Field::print_values() {
     for(int j = 0; j < this->len_y; j++){
         for(int i = 0; i < this->len_x; i++){
-            printf(" %d", this->field_matrix[i][j].get_value());
+            printf(" %d", this->field_matrix[i][j]->get_value());
         }
         printf("\n");
     }
 }
 
 Box* Field::trigger(Coordinates *coordinates) {
-    this->field_matrix[coordinates->get_x()][coordinates->get_y()].trigger();
+    this->field_matrix[coordinates->get_x()][coordinates->get_y()]->trigger();
 
-    return &this->field_matrix[coordinates->get_x()][coordinates->get_y()];
+    return this->field_matrix[coordinates->get_x()][coordinates->get_y()];
 }
 
 Box* Field::trigger(int x, int y) {
-    this->field_matrix[x][y].trigger();
+    this->field_matrix[x][y]->trigger();
 
-    return &this->field_matrix[x][y];
+    return this->field_matrix[x][y];
 }
 
 Box* Field::mark(int x, int y) {
-    bool is_mark = this->field_matrix[x][y].mark();
+    bool is_mark = this->field_matrix[x][y]->mark();
     if(is_mark)
         this->missing -= 1;
     else
         this->missing += 1;
-    return &this->field_matrix[x][y];
+    return this->field_matrix[x][y];
 }
 
 Box* Field::trigger(Box *box) {
     int x = box->get_coordinates()->get_x();
     int y = box->get_coordinates()->get_y();
-    this->field_matrix[x][y].trigger();
+    this->field_matrix[x][y]->trigger();
 
-    return &this->field_matrix[x][y];
+    return this->field_matrix[x][y];
 }
 
 int Field::count_mines(int x, int y) {
@@ -125,7 +137,7 @@ int Field::count_mines(int x, int y) {
 
     for(int j = box_start_y; j <= box_end_y; j++){
         for(int i = box_start_x; i <= box_end_x; i++){
-            if(this->field_matrix[i][j].get_type() == Box::MINE_TYPE) {
+            if(this->field_matrix[i][j]->get_type() == Box::MINE_TYPE) {
                 count++;
             }
         }
@@ -152,23 +164,23 @@ int Field::sanitize_y(int y) {
 void Field::update_count() {
     for(int j = 0; j < len_y; j++){
         for(int i = 0; i < len_x; i++){
-            if(this->field_matrix[i][j].get_type() != Box::MINE_TYPE) {
-                field_matrix[i][j].set_mines_count(count_mines(i, j));
+            if(this->field_matrix[i][j]->get_type() != Box::MINE_TYPE) {
+                field_matrix[i][j]->set_mines_count(count_mines(i, j));
             }
         }
     }
 }
 
 Box* Field::get_box_at(int x, int y){
-    return &this->field_matrix[x][y];
+    return this->field_matrix[x][y];
 }
 
 Box* Field::get_box_at(Coordinates *coordinates) {
     return this->get_box_at(coordinates->get_x(), coordinates->get_y());
 }
 
-Box* Field::get_surr(Coordinates *coordinates) {
-    Box* surr = new Box[8];
+std::vector<Box*> Field::get_surr(Coordinates *coordinates) {
+    std::vector<Box*> surr;
     int x = coordinates->get_x(), y = coordinates->get_y();
     int box_start_x, box_start_y, box_end_x, box_end_y, count = 0;
     box_start_x = this->sanitize_x(x - 1);
@@ -179,25 +191,25 @@ Box* Field::get_surr(Coordinates *coordinates) {
     for(int j = box_start_y; j <= box_end_y; j++){
         for(int i = box_start_x; i <= box_end_x; i++){
             if((i != x) || (j != y)) {
-                surr[count] = this->field_matrix[i][j];
-                count++;
+                surr.push_back(this->field_matrix[i][j]);
             }
         }
     }
-
     return surr;
 }
 
-Box* Field::get_surr(int x, int y) {
+std::vector<Box*> Field::get_surr(int x, int y) {
     Coordinates *coordinates = new Coordinates(x, y);
     return this->get_surr(coordinates);
 }
 
 int Field::get_surr_triggered(Coordinates *coordinates) {
-    Box *array = this->get_surr(coordinates);
+    std::vector<Box*> array = this->get_surr(coordinates);
     int count = 0;
-    for(int i = 0; i < 8; i++){
-        if(array[i].get_type() == Box::EMPTY_TYPE && array[i].is_triggered()) {
+    for(int i = 0; i < array.size(); i++){
+        if(array[i] == NULL)
+            continue;
+        if(array[i] != NULL && array[i]->get_type() == Box::EMPTY_TYPE && array[i]->is_triggered()) {
             count += 1;
         }
     }
@@ -227,11 +239,11 @@ void Field::trigger_cascade(Coordinates *coordinates) {
                 int surr = this->get_surr_triggered(i, j);
                 if(surr > 0){
                     if(
-                            this->field_matrix[i][j].get_type() != Box::MINE_TYPE &&
-                            !this->field_matrix[i][j].is_triggered()
+                            this->field_matrix[i][j]->get_type() != Box::MINE_TYPE &&
+                            !this->field_matrix[i][j]->is_triggered()
                             ){
                         go_on = true;
-                        this->field_matrix[i][j].trigger();
+                        this->field_matrix[i][j]->trigger();
                     }
                 }
             }
@@ -254,13 +266,13 @@ void Field::update_status() {
     bool is_empty = true;
     for(int j = 0; j < this->len_y; j++){
         for(int i = 0; i < this->len_x; i++){
-            if(this->field_matrix[i][j].is_triggered()){
-                if(this->field_matrix[i][j].get_type() == Box::MINE_TYPE) {
+            if(this->field_matrix[i][j]->is_triggered()){
+                if(this->field_matrix[i][j]->get_type() == Box::MINE_TYPE) {
                     this->status = STATUS_LOSE;
                     return;
                 }
             }
-            else if(!this->field_matrix[i][j].is_marked()){
+            else if(!this->field_matrix[i][j]->is_marked()){
                 is_empty = false;
             }
         }
@@ -273,7 +285,7 @@ std::string Field::to_string() {
     std::string string;
     for(int j = 0; j < this->len_y; j++){
         for(int i = 0; i < this->len_x; i++){
-            string.append(std::to_string(this->field_matrix[i][j].get_type()));
+            string.append(std::to_string(this->field_matrix[i][j]->get_type()));
         }
         string.append("\n");
     }

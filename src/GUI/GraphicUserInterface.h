@@ -18,6 +18,8 @@ public:
     GraphicUserInterface(Player *player);
     GraphicUserInterface();
 
+    ~GraphicUserInterface();
+
     void setup_new_game();
     Coordinates* input_coordinates();
     void update_screen();

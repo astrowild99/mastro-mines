@@ -8,6 +8,7 @@ GameInterface::GameInterface() : GameInterface(new Player()) {};
 
 GameInterface::GameInterface(Player *player) {
     this->player = player;
+    this->field = NULL;
 }
 
 int GameInterface::game_loop() {

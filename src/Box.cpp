@@ -8,33 +8,40 @@
 Box::Box() {
     this->type = Box::EMPTY_TYPE;
     this->triggered = false;
+    this->marked = false;
     this->coordinates = new Coordinates();
+    this->value = 0;
 }
 
 Box::Box(int type) {
     this->type = type;
     this->triggered = false;
+    this->marked = false;
     this->coordinates = new Coordinates();
+    this->value = 0;
 }
 
 Box::Box(int type, Coordinates *coordinates) {
     this->type = type;
     this->triggered = false;
+    this->marked = false;
     this->coordinates = coordinates;
+    this->value = 0;
 }
 
 Box::Box(int type, int x, int y) {
     this->type = type;
     this->triggered = false;
+    this->marked = false;
     this->coordinates = new Coordinates(x, y);
+    this->value = 0;
 }
 
 Box::Box(Coordinates *coordinates) {
     this->coordinates = coordinates;
     this->triggered = false;
-}
-
-Box::~Box() {
+    this->marked = false;
+    this->value = 0;
 }
 
 int Box::get_value() {

@@ -19,7 +19,13 @@ static GtkApplication *app;
 GraphicUserInterface::GraphicUserInterface() : GraphicUserInterface(new Player()) {}
 
 GraphicUserInterface::GraphicUserInterface(Player *player) : GameInterface(){
+    g_print("GUI CREATED\n");
     this->player = player;
+}
+
+GraphicUserInterface::~GraphicUserInterface() {
+    delete this->field;
+    g_print("GUI DELETED\n");
 }
 
 void GraphicUserInterface::setup_new_game() {
@@ -189,7 +195,6 @@ void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
     for(int j = 0; j < gui->field->get_len_y(); j++){
         for(int i = 0; i < gui->field->get_len_x(); i++){
             button = gtk_button_new();
-//            gtk_button_set_label(GTK_BUTTON(button), gui->field->get_box_at(i, j)->get_string_display().c_str());
             gtk_button_set_label(GTK_BUTTON(button), " ");
 
             auto *s = new hit_target_struct;
