@@ -24,6 +24,7 @@ public:
     void setup_new_game();
     Coordinates* input_coordinates();
     void update_screen();
+    void reveal_screen();
 
     void win_display();
     void lose_display();
@@ -35,7 +36,7 @@ public:
 
     static void activate(GtkApplication *app, gpointer data);
     static void start_game(GtkApplication *app, gpointer data);
-    static void hit_target(GtkApplication *app, gpointer data);
+    static void hit_target(GtkWidget *btn, GdkEventButton *event, gpointer data);
 
 };
 

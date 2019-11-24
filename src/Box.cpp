@@ -67,6 +67,8 @@ int Box::get_y() {
 }
 
 char Box::get_display() {
+    if(this->marked)
+        return Box::MARK_CHAR;
     if(!this->triggered)
         return Box::PLACEHOLDER_CHAR;
     if(this->type == Box::MINE_TYPE)
@@ -118,6 +120,22 @@ void Box::trigger() {
 Box Box::set_triggered(bool triggered) {
     this->triggered = triggered;
     return *this;
+}
+
+bool Box::is_marked() {
+    return this->marked;
+}
+
+Box Box::set_marked(bool marked) {
+    this->marked = marked;
+
+    return *this;
+}
+
+bool Box::mark() {
+    this->marked = !this->marked;
+
+    return this->marked;
 }
 
 std::string Box::to_string() {

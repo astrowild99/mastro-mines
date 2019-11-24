@@ -11,7 +11,8 @@
 class Box {
 private:
     int type, value;
-    bool triggered;
+    bool triggered = false;
+    bool marked = false;
     Coordinates *coordinates;
 public:
     Box();
@@ -33,6 +34,9 @@ public:
     Box set_coordinates(int x, int y);
     Box set_triggered(bool triggered);
     bool is_triggered();
+    Box set_marked(bool marked);
+    bool is_marked();
+    bool mark();
     char get_display();
     std::string get_string_display();
     std::string get_string_triggered();
@@ -43,9 +47,10 @@ public:
     static const int EMPTY_TYPE = 0;
     static const int MINE_TYPE = 1;
     static const int NUMBER_TYPE = 2;
-    static const char PLACEHOLDER_CHAR = ' ';
-    static const char EMPTY_CHAR = '*';
+    static const char PLACEHOLDER_CHAR = '*';
+    static const char EMPTY_CHAR = ' ';
     static const char MINE_CHAR = 'X';
+    static const char MARK_CHAR = 'P';
 };
 
 

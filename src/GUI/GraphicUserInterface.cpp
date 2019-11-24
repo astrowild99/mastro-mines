@@ -12,7 +12,7 @@ struct hit_target_struct {
 
 static GtkEntryBuffer *buffer_x = NULL, *buffer_y = NULL, *buffer_mines = NULL;
 
-static GtkWidget *grid;
+static GtkWidget *window, *grid;
 
 GraphicUserInterface::GraphicUserInterface(int argc, char** argv) : GraphicUserInterface(argc, argv, new Player()) {}
 
@@ -36,8 +36,12 @@ void GraphicUserInterface::update_screen() {
     for(int j = 0; j < this->field->get_len_y(); j++){
         for(int i = 0; i < this->field->get_len_x(); i++){
             box = field->get_box_at(i, j);
+            button = gtk_grid_get_child_at(GTK_GRID(grid), i, j);
+            gtk_button_set_label(GTK_BUTTON(button), " ");
+            if(box->is_marked()){
+                gtk_button_set_label(GTK_BUTTON(button), box->get_string_display().c_str());
+            }
             if(box->is_triggered()){
-                button = gtk_grid_get_child_at(GTK_GRID(grid), i, j);
                 gtk_button_set_label(GTK_BUTTON(button), box->get_string_display().c_str());
                 gtk_widget_set_sensitive(button, FALSE);
             }
@@ -45,12 +49,48 @@ void GraphicUserInterface::update_screen() {
     }
 }
 
-void GraphicUserInterface::win_display() {
+void GraphicUserInterface::reveal_screen() {
+    GtkWidget *button;
+    Box *box;
+    for(int j = 0; j < this->field->get_len_y(); j++){
+        for(int i = 0; i < this->field->get_len_x(); i++){
+            box = field->get_box_at(i, j);
+            button = gtk_grid_get_child_at(GTK_GRID(grid), i, j);
+            if(box->get_type() == Box::MINE_TYPE)
+                gtk_button_set_label(GTK_BUTTON(button), "X");
+        }
+    }
+}
 
+void GraphicUserInterface::win_display() {
+    GtkWidget *dialog;
+
+    dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window),
+            GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_OTHER,
+            GTK_BUTTONS_CLOSE,
+            "Hai vinto!");
+
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    gtk_widget_destroy(window);
 }
 
 void GraphicUserInterface::lose_display() {
+    GtkWidget *dialog;
 
+    dialog = gtk_message_dialog_new(
+            GTK_WINDOW(window),
+            GTK_DIALOG_DESTROY_WITH_PARENT,
+            GTK_MESSAGE_OTHER,
+            GTK_BUTTONS_CLOSE,
+            "Hai perso!");
+
+    GraphicUserInterface::reveal_screen();
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    gtk_widget_destroy(window);
 }
 
 int GraphicUserInterface::init_window(int argc, char **argv) {
@@ -111,7 +151,6 @@ void GraphicUserInterface::activate(GtkApplication *app, gpointer data) {
 
 void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
     GraphicUserInterface *gui = (GraphicUserInterface*) data;
-    GtkWidget *window;
     GtkWidget *box;
     GtkWidget *button;
 
@@ -138,12 +177,13 @@ void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
     for(int j = 0; j < gui->field->get_len_y(); j++){
         for(int i = 0; i < gui->field->get_len_x(); i++){
             button = gtk_button_new();
-            gtk_button_set_label(GTK_BUTTON(button), gui->field->get_box_at(i, j)->get_string_display().c_str());
+//            gtk_button_set_label(GTK_BUTTON(button), gui->field->get_box_at(i, j)->get_string_display().c_str());
+            gtk_button_set_label(GTK_BUTTON(button), " ");
 
             auto *s = new hit_target_struct;
             s->gui = gui;
             s->box = gui->field->get_box_at(i, j);
-            g_signal_connect(button, "clicked", G_CALLBACK(GraphicUserInterface::hit_target), s);
+            g_signal_connect(button, "button-press-event", G_CALLBACK(GraphicUserInterface::hit_target), s);
             gtk_grid_attach(GTK_GRID(grid), button, i, j, 1, 1);
         }
     }
@@ -151,15 +191,24 @@ void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
     gtk_widget_show_all(window);
 }
 
-void GraphicUserInterface::hit_target(GtkApplication *app, gpointer data) {
+void GraphicUserInterface::hit_target(GtkWidget *btn, GdkEventButton *event, gpointer data) {
     GtkWidget *button;
     auto *s = (hit_target_struct*) data;
     auto *gui = (GraphicUserInterface*) s->gui;
     Box *box = (Box*) s->box;
 
-    //triggering the cascade
-    gui->field->trigger_cascade(s->box->get_x(), s->box->get_y());
+    //triggering the cascade or the marker
+    if (event->type == GDK_BUTTON_PRESS && event->button == 1)
+        gui->field->trigger_cascade(s->box->get_x(), s->box->get_y());
+    else if(event->type == GDK_BUTTON_PRESS && event->button == 3)
+        box->mark();
     gui->update_screen();
+
+    //checking if winnig
+    if(gui->field->get_status() == Field::STATUS_WIN)
+        gui->win_display();
+    if(gui->field->get_status() == Field::STATUS_LOSE)
+        gui->lose_display();
 
 }
 

@@ -236,6 +236,7 @@ void Field::trigger_cascade(int x, int y) {
 }
 
 int Field::get_status() {
+    this->update_status();
     return this->status;
 }
 
