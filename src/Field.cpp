@@ -27,6 +27,7 @@ Field::Field(int len_x, int len_y) {
 
 Field::Field(int len_x, int len_y, int mines) : Field::Field(len_x, len_y){
     this->mines = mines;
+    this->missing = mines;
 
     srand(time(NULL));
 
@@ -99,6 +100,15 @@ Box* Field::trigger(Coordinates *coordinates) {
 Box* Field::trigger(int x, int y) {
     this->field_matrix[x][y].trigger();
 
+    return &this->field_matrix[x][y];
+}
+
+Box* Field::mark(int x, int y) {
+    bool is_mark = this->field_matrix[x][y].mark();
+    if(is_mark)
+        this->missing -= 1;
+    else
+        this->missing += 1;
     return &this->field_matrix[x][y];
 }
 
@@ -203,6 +213,10 @@ int Field::get_surr_triggered(int x, int y) {
     return this->get_surr_triggered(coordinates);
 }
 
+int Field::get_missing() {
+    return this->missing;
+}
+
 void Field::trigger_cascade(Coordinates *coordinates) {
     this->trigger(coordinates);
 
@@ -250,7 +264,7 @@ void Field::update_status() {
                     return;
                 }
             }
-            else{
+            else if(!this->field_matrix[i][j].is_marked()){
                 is_empty = false;
             }
         }

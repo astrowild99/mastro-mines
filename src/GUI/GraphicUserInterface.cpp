@@ -12,7 +12,7 @@ struct hit_target_struct {
 
 static GtkEntryBuffer *buffer_x = NULL, *buffer_y = NULL, *buffer_mines = NULL;
 
-static GtkWidget *window, *grid;
+static GtkWidget *window, *grid, *missing_counter;
 
 GraphicUserInterface::GraphicUserInterface(int argc, char** argv) : GraphicUserInterface(argc, argv, new Player()) {}
 
@@ -33,6 +33,10 @@ Coordinates* GraphicUserInterface::input_coordinates() {
 void GraphicUserInterface::update_screen() {
     GtkWidget *button;
     Box *box;
+    char buff[50];
+
+    sprintf(buff, "Missing mines: %d", field->get_missing());
+    gtk_label_set_text(GTK_LABEL(missing_counter), buff);
     for(int j = 0; j < this->field->get_len_y(); j++){
         for(int i = 0; i < this->field->get_len_x(); i++){
             box = field->get_box_at(i, j);
@@ -114,8 +118,6 @@ void GraphicUserInterface::activate(GtkApplication *app, gpointer data) {
 
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Mines");
-    gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
-    gui->set_gtk_window_id(gtk_application_window_get_id(GTK_APPLICATION_WINDOW(window)));
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_add(GTK_CONTAINER(window), box);
@@ -140,6 +142,11 @@ void GraphicUserInterface::activate(GtkApplication *app, gpointer data) {
     gtk_entry_set_buffer(GTK_ENTRY(entry_mines), buffer_mines);
     gtk_container_add(GTK_CONTAINER(box), entry_mines);
 
+    //setting defaults
+    gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_x), std::to_string(Field::STD_X).c_str(), 1);
+    gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_y), std::to_string(Field::STD_Y).c_str(), 1);
+    gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_mines), std::to_string(Field::STD_MINES).c_str(), 2);
+
     button_box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_container_add(GTK_CONTAINER(box), button_box);
 
@@ -162,11 +169,15 @@ void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
             );
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_default_size(GTK_WINDOW(window), 600, 400);
     gtk_window_set_title(GTK_WINDOW(window), "Actual Game");
+    gtk_container_set_border_width(GTK_CONTAINER(window), 30);
 
-    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 1);
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
     gtk_container_add(GTK_CONTAINER(window), box);
+    gtk_box_set_spacing(GTK_BOX(box), 10);
+
+    missing_counter = gtk_label_new("Missing mines: ");
+    gtk_container_add(GTK_CONTAINER(box), missing_counter);
 
     grid = gtk_grid_new();
     gtk_container_add(GTK_CONTAINER(box), grid);
@@ -188,6 +199,7 @@ void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
         }
     }
 
+    gui->update_screen();
     gtk_widget_show_all(window);
 }
 
@@ -201,7 +213,7 @@ void GraphicUserInterface::hit_target(GtkWidget *btn, GdkEventButton *event, gpo
     if (event->type == GDK_BUTTON_PRESS && event->button == 1)
         gui->field->trigger_cascade(s->box->get_x(), s->box->get_y());
     else if(event->type == GDK_BUTTON_PRESS && event->button == 3)
-        box->mark();
+        gui->field->mark(s->box->get_x(), s->box->get_y());
     gui->update_screen();
 
     //checking if winnig
@@ -210,12 +222,4 @@ void GraphicUserInterface::hit_target(GtkWidget *btn, GdkEventButton *event, gpo
     if(gui->field->get_status() == Field::STATUS_LOSE)
         gui->lose_display();
 
-}
-
-void GraphicUserInterface::set_gtk_window_id(int id) {
-    this->gtk_window_id = id;
-}
-
-int GraphicUserInterface::get_gtk_window_id() {
-    return this->gtk_window_id;
 }

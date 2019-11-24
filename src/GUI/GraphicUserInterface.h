@@ -12,7 +12,6 @@
 class GraphicUserInterface : GameInterface {
 private:
     GtkApplication *app;
-    int gtk_window_id;
 
     int argc;
     char** argv;
@@ -30,9 +29,6 @@ public:
     void lose_display();
 
     int init_window(int argc, char **argv);
-
-    int get_gtk_window_id();
-    void set_gtk_window_id(int id);
 
     static void activate(GtkApplication *app, gpointer data);
     static void start_game(GtkApplication *app, gpointer data);
