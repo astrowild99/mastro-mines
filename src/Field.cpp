@@ -20,6 +20,7 @@ Field::Field(int len_x, int len_y) {
     for(int j = 0; j < len_y; j++){
         for(int i = 0; i < len_x; i++){
             this->field_matrix[i][j].set_coordinates(new Coordinates(i, j));
+            this->field_matrix[i][j].set_triggered(false);
         }
     }
 }
@@ -251,4 +252,15 @@ void Field::update_status() {
     }
     if(is_empty)
         this->status = Field::STATUS_WIN;
+}
+
+std::string Field::to_string() {
+    std::string string;
+    for(int j = 0; j < this->len_y; j++){
+        for(int i = 0; i < this->len_x; i++){
+            string.append(std::to_string(this->field_matrix[i][j].get_type()));
+        }
+        string.append("\n");
+    }
+    return string;
 }

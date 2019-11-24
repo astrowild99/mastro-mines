@@ -12,13 +12,11 @@
 class GraphicUserInterface : GameInterface {
 private:
     GtkApplication *app;
-    GtkWidget *window;
-    GtkWidget *start_button;
+    int gtk_window_id;
 
-    int status;
 public:
-    GraphicUserInterface(GtkApplication* app, Player *player);
-    GraphicUserInterface(GtkApplication* app);
+    GraphicUserInterface(Player *player);
+    GraphicUserInterface();
 
     void setup_new_game();
     Coordinates* input_coordinates();
@@ -26,6 +24,14 @@ public:
 
     void win_display();
     void lose_display();
+
+    int init_window(int argc, char **argv);
+
+    int get_gtk_window_id();
+    void set_gtk_window_id(int id);
+
+    static void activate(GtkApplication *app, gpointer data);
+    static void start_game(GtkApplication *app, gpointer data);
 
 };
 

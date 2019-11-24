@@ -29,8 +29,11 @@ public:
     Coordinates *get_coordinates();
     Box set_coordinates(Coordinates *coordinates);
     Box set_coordinates(int x, int y);
+    Box set_triggered(bool triggered);
     bool is_triggered();
     char get_display();
+    std::string get_string_display();
+    std::string get_string_triggered();
 
     void set_mines_count(int count);
     void trigger();

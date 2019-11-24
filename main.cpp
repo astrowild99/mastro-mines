@@ -10,7 +10,8 @@ using namespace std;
 
 int main(int argc, char** argv) {
     gtk_init(&argc, &argv);
-    GraphicUserInterface *gui = new GraphicUserInterface(argc, argv);
+    GraphicUserInterface *gui = new GraphicUserInterface();
+    gui->init_window(argc, argv);
     Player *player = new Player();
     player->set_name("Donato");
     CommandLineInterface *interface = new CommandLineInterface(player);

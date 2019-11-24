@@ -56,6 +56,8 @@ public:
     void print_types();
     void print_values();
 
+    std::string to_string();
+
     void update_status();
 };
 

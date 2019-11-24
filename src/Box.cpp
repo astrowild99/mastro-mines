@@ -63,6 +63,17 @@ char Box::get_display() {
     return std::to_string(this->value)[0];
 }
 
+std::string Box::get_string_display() {
+    std::string string(1, this->get_display());
+    return string;
+}
+
+std::string Box::get_string_triggered() {
+    std::string string;
+    string.append(std::to_string(this->is_triggered()));
+    return string;
+}
+
 Coordinates* Box::get_coordinates() {
     return this->coordinates;
 }
@@ -89,6 +100,11 @@ void Box::set_mines_count(int count) {
 void Box::trigger() {
     if(!this->triggered)
         this->triggered = true;
+}
+
+Box Box::set_triggered(bool triggered) {
+    this->triggered = triggered;
+    return *this;
 }
 
 std::string Box::to_string() {
