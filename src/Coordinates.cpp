@@ -15,6 +15,10 @@ Coordinates::Coordinates(int x, int y) {
     this->y = y;
 }
 
+Coordinates::~Coordinates() {
+
+}
+
 int Coordinates::get_x() {
     return this->x;
 }
@@ -56,9 +60,7 @@ std::string Coordinates::to_string() {
 }
 
 bool Coordinates::is_zero() {
-    if(this->x == 0 && this->y == 0)
-        return true;
-    return false;
+    return this->x == 0 && this->y == 0;
 }
 
 bool Coordinates::is_valid() {

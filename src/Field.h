@@ -6,6 +6,7 @@
 #define MINES_FIELD_H
 
 
+#include <vector>
 #include "Box.h"
 #include "Coordinates.h"
 

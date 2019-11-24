@@ -34,6 +34,9 @@ Box::Box(Coordinates *coordinates) {
     this->triggered = false;
 }
 
+Box::~Box() {
+}
+
 int Box::get_value() {
     return this->value;
 }

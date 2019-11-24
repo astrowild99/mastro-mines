@@ -12,6 +12,7 @@ private:
 public:
     Coordinates();
     Coordinates(int x, int y);
+    ~Coordinates();
 
     std::string to_string();
 

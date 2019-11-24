@@ -14,12 +14,14 @@ private:
     bool triggered = false;
     bool marked = false;
     Coordinates *coordinates;
+
 public:
     Box();
     Box(Coordinates *coordinates);
     Box(int type);
     Box(int type, Coordinates *coordinates);
     Box(int type, int x, int y);
+    ~Box();
 
     std::string to_string();
 

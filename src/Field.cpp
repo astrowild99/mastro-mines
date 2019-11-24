@@ -53,7 +53,10 @@ Field::Field(Coordinates *coordinates, int mines) : Field(coordinates->get_x(), 
 Field::Field() : Field(Field::STD_X, Field::STD_Y, Field::STD_MINES){}
 
 Field::~Field() {
-    free(this->field_matrix);
+    for (int i = 0; i < this->len_x; i++) {
+        delete[] this->field_matrix[i];
+    }
+    delete[] this->field_matrix;
 }
 
 int Field::get_len_x() {

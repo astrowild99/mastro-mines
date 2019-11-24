@@ -45,7 +45,7 @@ void GraphicUserInterface::update_screen() {
             if(box->is_marked()){
                 gtk_button_set_label(GTK_BUTTON(button), box->get_string_display().c_str());
             }
-            if(box->is_triggered()){
+            else if(box->is_triggered()){
                 gtk_button_set_label(GTK_BUTTON(button), box->get_string_display().c_str());
                 gtk_widget_set_sensitive(button, FALSE);
             }
@@ -79,6 +79,7 @@ void GraphicUserInterface::win_display() {
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
     gtk_widget_destroy(window);
+    delete field;
 }
 
 void GraphicUserInterface::lose_display() {
@@ -95,6 +96,7 @@ void GraphicUserInterface::lose_display() {
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
     gtk_widget_destroy(window);
+    delete field;
 }
 
 int GraphicUserInterface::init_window(int argc, char **argv) {

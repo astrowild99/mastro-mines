@@ -12,7 +12,6 @@
 class GraphicUserInterface : GameInterface {
 private:
     GtkApplication *app;
-
     int argc;
     char** argv;
 
