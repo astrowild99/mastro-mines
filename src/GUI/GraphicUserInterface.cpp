@@ -5,16 +5,16 @@
 #include "GraphicUserInterface.h"
 #include <gtk/gtk.h>
 
-struct hit_target_struct {
-    GraphicUserInterface *gui;
-    Box *box;
-};
-
 static GtkEntryBuffer *buffer_x = NULL, *buffer_y = NULL, *buffer_mines = NULL;
 
 static GtkWidget *window, *grid, *missing_counter;
 
 static GtkApplication *app;
+
+struct pass_struct {
+    GraphicUserInterface *gui;
+    Box *box;
+};
 
 GraphicUserInterface::GraphicUserInterface() : GraphicUserInterface(new Player()) {}
 
@@ -85,7 +85,7 @@ void GraphicUserInterface::win_display() {
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
     gtk_widget_destroy(window);
-    delete this;
+    delete this->field;
 }
 
 void GraphicUserInterface::lose_display() {
@@ -102,20 +102,22 @@ void GraphicUserInterface::lose_display() {
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
     gtk_widget_destroy(window);
-    delete this;
+    delete this->field;
 }
 
 int GraphicUserInterface::init_window(int argc, char **argv) {
     int status;
 
     app = gtk_application_new("mines.donato.com", G_APPLICATION_FLAGS_NONE);
-    g_signal_connect(app, "activate", G_CALLBACK(GraphicUserInterface::activate), NULL);
+    g_signal_connect(app, "activate", G_CALLBACK(activate), this); //TESTA DI CAZZO
     status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);
     return status;
 }
 
 void GraphicUserInterface::activate(GtkApplication *app, gpointer data) {
+    GraphicUserInterface *gui = reinterpret_cast<GraphicUserInterface*>(data);
+
     GtkWidget *window;
     GtkWidget *button_box;
     GtkWidget *start_button;
@@ -158,13 +160,14 @@ void GraphicUserInterface::activate(GtkApplication *app, gpointer data) {
     gtk_container_add(GTK_CONTAINER(box), button_box);
 
     start_button = gtk_button_new_with_label("Start");
-    g_signal_connect(start_button, "clicked", G_CALLBACK(GraphicUserInterface::start_game), NULL);
+    g_signal_connect(start_button, "clicked", G_CALLBACK(GraphicUserInterface::start_game), gui);
     gtk_container_add(GTK_CONTAINER(button_box), start_button);
     gtk_widget_show_all(window);
 }
 
 void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
-    GraphicUserInterface *gui = new GraphicUserInterface();
+    GraphicUserInterface *gui = reinterpret_cast<GraphicUserInterface*>(data);
+
     GtkWidget *box;
     GtkWidget *button;
 
@@ -191,35 +194,48 @@ void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
     gtk_grid_set_column_spacing(GTK_GRID(grid), 2);
     gtk_grid_set_row_spacing(GTK_GRID(grid), 2);
 
+    std::vector<std::vector<pass_struct*>> s;
+    //creating the matrix
+    s.resize(gui->field->get_len_x());
+    for(int j = 0; j < gui->field->get_len_x(); j++){
+        s[j].resize(gui->field->get_len_y());
+    }
+
+    for(int j = 0; j < gui->field->get_len_y(); j++){
+        for(int i = 0; i < gui->field->get_len_x(); i++){
+            s[i][j] = new pass_struct;
+        }
+    }
+
     //printing the grid
     for(int j = 0; j < gui->field->get_len_y(); j++){
         for(int i = 0; i < gui->field->get_len_x(); i++){
             button = gtk_button_new();
             gtk_button_set_label(GTK_BUTTON(button), " ");
-
-            auto *s = new hit_target_struct;
-            s->gui = gui;
-            s->box = gui->field->get_box_at(i, j);
-            g_signal_connect(button, "button-press-event", G_CALLBACK(GraphicUserInterface::hit_target), s);
+            s[i][j]->gui = gui;
+            s[i][j]->box = gui->field->get_box_at(i, j);
+            g_signal_connect(button, "button-press-event", G_CALLBACK(GraphicUserInterface::hit_target), s[i][j]);
             gtk_grid_attach(GTK_GRID(grid), button, i, j, 1, 1);
         }
     }
 
     gui->update_screen();
     gtk_widget_show_all(window);
+
+    s.clear();
 }
 
 void GraphicUserInterface::hit_target(GtkWidget *btn, GdkEventButton *event, gpointer data) {
     GtkWidget *button;
-    auto *s = (hit_target_struct*) data;
-    auto *gui = (GraphicUserInterface*) s->gui;
+    pass_struct *s = reinterpret_cast<pass_struct*>(data);
+    GraphicUserInterface *gui = (GraphicUserInterface*) s->gui;
     Box *box = (Box*) s->box;
 
     //triggering the cascade or the marker
     if (event->type == GDK_BUTTON_PRESS && event->button == 1)
-        gui->field->trigger_cascade(s->box->get_x(), s->box->get_y());
+        gui->field->trigger_cascade(box->get_x(), box->get_y());
     else if(event->type == GDK_BUTTON_PRESS && event->button == 3)
-        gui->field->mark(s->box->get_x(), s->box->get_y());
+        gui->field->mark(box->get_x(), box->get_y());
     gui->update_screen();
 
     //checking if winnig

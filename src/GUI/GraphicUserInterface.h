@@ -28,7 +28,7 @@ public:
     void win_display();
     void lose_display();
 
-    static int init_window(int argc, char **argv);
+    int init_window(int argc, char **argv);
 
     static void activate(GtkApplication *app, gpointer data);
     static void start_game(GtkApplication *app, gpointer data);

@@ -15,13 +15,19 @@ int main(int argc, char** argv) {
     if(argc > 1){
         std::string input(argv[1]);
         if(input == TAG_CLI){
+            int a = 1;
             CommandLineInterface *cli = new CommandLineInterface(argc, argv);
-            cli->setup_new_game();
-            cli->game_loop();
+            while(a){
+                cli->setup_new_game();
+                cli->game_loop();
+                std::cout << "Continuare?" << std::endl;
+                std::cin >> a;
+            }
             return 0;
         }
     }
-    gtk_init(&argc, &argv);
-    GraphicUserInterface::init_window(argc, argv);
+//    gtk_init(&argc, &argv);
+    GraphicUserInterface *gui = new GraphicUserInterface();
+    gui->init_window(argc, argv);
     return 0;
 }
