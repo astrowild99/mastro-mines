@@ -8,7 +8,7 @@ CommandLineInterface::CommandLineInterface(int argc, char** argv) : GameInterfac
     printf(" . . . Starting a new Game . . . \n");
 }
 
-CommandLineInterface::CommandLineInterface(int argc, char** argv, Player *player) : GameInterface(){
+CommandLineInterface::CommandLineInterface(int argc, char** argv, Player *player) : GameInterface() {
     this->player = player;
 }
 

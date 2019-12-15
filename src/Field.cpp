@@ -231,6 +231,7 @@ void Field::trigger_cascade(Coordinates *coordinates) {
     if(!this->get_box_at(coordinates)->get_type() == Box::EMPTY_TYPE)
         return;
 
+    //optimize this shit
     bool go_on = true;
     while(go_on){
         go_on = false;
