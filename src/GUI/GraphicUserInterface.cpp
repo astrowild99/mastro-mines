@@ -242,6 +242,6 @@ void GraphicUserInterface::hit_target(GtkWidget *btn, GdkEventButton *event, gpo
     //checking if winnig
     if(gui->field->get_status() == Field::STATUS_WIN)
         gui->win_display();
-    if(gui->field->get_status() == Field::STATUS_LOSE)
+    else if(gui->field->get_status() == Field::STATUS_LOSE)
         gui->lose_display();
 }
