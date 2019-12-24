@@ -75,6 +75,7 @@ void GraphicUserInterface::reveal_screen() {
 void GraphicUserInterface::win_display() {
     GtkWidget *dialog;
 
+    // fixed here the memory leak!
     dialog = gtk_message_dialog_new(
             GTK_WINDOW(window),
             GTK_DIALOG_DESTROY_WITH_PARENT,
