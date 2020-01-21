@@ -196,6 +196,7 @@ void GraphicUserInterface::start_game(GtkApplication *app, gpointer data) {
     gtk_grid_set_row_spacing(GTK_GRID(grid), 2);
 
     std::vector<std::vector<pass_struct*>> s;
+
     //creating the matrix
     s.resize(gui->field->get_len_x());
     for(int j = 0; j < gui->field->get_len_x(); j++){
@@ -233,8 +234,10 @@ void GraphicUserInterface::hit_target(GtkWidget *btn, GdkEventButton *event, gpo
     Box *box = (Box*) s->box;
 
     //triggering the cascade or the marker
-    if (event->type == GDK_BUTTON_PRESS && event->button == 1)
-        gui->field->trigger_cascade(box->get_x(), box->get_y());
+    if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
+        if (!box->is_marked())
+            gui->field->trigger_cascade(box->get_x(), box->get_y());
+    }
     else if(event->type == GDK_BUTTON_PRESS && event->button == 3)
         gui->field->mark(box->get_x(), box->get_y());
     gui->update_screen();

@@ -228,7 +228,7 @@ int Field::get_missing() {
 void Field::trigger_cascade(Coordinates *coordinates) {
     this->trigger(coordinates);
 
-    if(!this->get_box_at(coordinates)->get_type() == Box::EMPTY_TYPE)
+    if(this->get_box_at(coordinates)->get_type() != Box::EMPTY_TYPE)
         return;
 
     //optimize this shit
