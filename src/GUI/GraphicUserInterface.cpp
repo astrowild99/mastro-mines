@@ -152,7 +152,7 @@ void GraphicUserInterface::activate(GtkApplication *app, gpointer data) {
     gtk_entry_set_buffer(GTK_ENTRY(entry_mines), buffer_mines);
     gtk_container_add(GTK_CONTAINER(box), entry_mines);
 
-    //setting defaults
+    // setting defaults
     gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_x), std::to_string(Field::STD_X).c_str(), 2);
     gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_y), std::to_string(Field::STD_Y).c_str(), 2);
     gtk_entry_buffer_set_text(GTK_ENTRY_BUFFER(buffer_mines), std::to_string(Field::STD_MINES).c_str(), 2);
@@ -243,8 +243,9 @@ void GraphicUserInterface::hit_target(GtkWidget *btn, GdkEventButton *event, gpo
     gui->update_screen();
 
     //checking if winnig
-    if(gui->field->get_status() == Field::STATUS_WIN)
+    int status = gui->field->get_status();
+    if(status == Field::STATUS_WIN)
         gui->win_display();
-    else if(gui->field->get_status() == Field::STATUS_LOSE)
+    else if(status == Field::STATUS_LOSE)
         gui->lose_display();
 }
